@@ -71,15 +71,12 @@
 /* click-to-drag on full border, but not the content */
 #main-window:not(.titlebar-buttonbox-container) {
   -moz-window-dragging: drag;
-  cursor: grab;
 }
 #main-window:active {
-  cursor: dragging;
 }
 #navigator-toolbox,
 #browser {
   -moz-window-dragging: no-drag;
-  cursor: auto;
 }
 
 /* -- Fullscreen */
@@ -211,12 +208,6 @@ toolbarbutton[open="true"] {
 
 
 /* MARK -- Titlebar - Window Buttons */
-.titlebar-buttonbox-container,
-.titlebar-buttonbox-container:hover {
-  -moz-window-dragging: no-drag;
-  /* FIXME: the `no-drag` works, but the cursor still renders a hand */
-  cursor: default !important;
-}
 .titlebar-buttonbox-container {
   position: fixed;
   top: 0;
