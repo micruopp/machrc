@@ -1,0 +1,9 @@
+# any files with a local namespace
+*.local
+*.local.*
+local.*
+
+local/
+# any local files i want to keep, like examples...
+# !local/*.sample
+
