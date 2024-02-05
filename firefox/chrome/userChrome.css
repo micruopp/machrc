@@ -1,162 +1,291 @@
+/* userChrome.css */
+
+/*
+ * General XML structure:
+ *
+ *  Window
+ *      Browser
+ *      Toolbar
+ *          TitleBar
+ *              TabBar
+ *              WindowButtonbox
+ *          NavBar
+ *              Container
+ *                  BackButton
+ *                  ForwardButton
+ *                  ReloadButton
+ *                  URLBar
+ *                  ExtensionsButton
+ *              OverflowButton
+ *              AppMenuButton
+ *          BookmarkBar
+ *
+ */
+
+/* MARK -- Variables */
+
 :root {
-  --user-bg: rgba(125, 69, 255, 0.5);
+  /* colors */
+  /* TODO: prefix these with `--user` */
+  --rgb-purple:         125, 69, 255;
+  --rgb-blue-navy:      10, 7, 36;
+  --rgb-blue-royal1:    95, 95, 255;
+  /*--rgb-: ,,;*/
+
+  /* TODO: rename these to --user-window-* */
+  --user-bg: rgba(var(--rgb-purple), 0.5);
   --user-fg: rgba(0, 0, 0, 1.0);
 
+  --user-sidebar-bg: rgba(125, 101, 255, 0.5);
+
+  /* window settings */
   --user-window-padding: 25px;
+
+  /* window buttons */
   --user-window-controls-padding: 6px;
   --user-window-controls-height: 16px;
-  --user-navigator-width-hidden: 19px;
+  
+  /* Browser */
+  --user-browser-border-radius: 5px;
+
+  /* toolbar */
+  --user-navigator-width-hidden: var(--user-window-padding);
   --user-navigator-width-visible: 600px;
+  --user-navigator-width: var(--user-navigator-width-hidden);
   --user-navigator-trans-time: 0.3s;
+
+  /* effects */
+  --user-browser-filter: none;
+  --user-browser-blur: blur(3px);
 }
 
-/* click-to-drag on full border, but not the content */
+
+/* MARK -- Window */
+/* top `<html>` tag */
 #main-window {
+  background-color: var(--user-bg) !important;
+  box-sizing: border-box;
+}
+
+/* -- Click-to-drag */
+/* click-to-drag on full border, but not the content */
+#main-window:not(.titlebar-buttonbox-container) {
   -moz-window-dragging: drag;
+  cursor: grab;
+}
+#main-window:active {
+  cursor: dragging;
 }
 #navigator-toolbox,
 #browser {
   -moz-window-dragging: no-drag;
+  cursor: auto;
 }
 
-/* Top element */
-#main-window {
-  /*background-color: transparent !important;*/
-  background-color: var(--user-bg) !important;
-}
-
-/*
- * #main-window[inFullscreen="true"] ->
- *  adjust left spacing -- currently clamps to side of screen (no padding)
- */
-
-/* top layout (default) */
-/*
-body {
-  flex-direction: column !important;
-}
-*/
-/* right layout */
-/*
-body {
-  flex-direction: row-reverse !important;
-}
-*/
-/* bottom layout */
-/*
-body {
-  flex-direction: column !important;
-}
-*/
-/* left layout */
-body {
-  flex-direction: row !important;
-}
-
-
-/* Entire top toolbar */
-#navigator-toolbox {
-  margin-left: calc(var(--user-window-padding) - var(--user-navigator-width-hidden)); /* spacing between nav and window */
-  width: var(--user-navigator-width-hidden);
-  background-color: transparent !important;
-  border-bottom: none !important;
-  transition: var(--user-navigator-trans-time) ease-in;
-  transition-delay: 0.25s;
-  transition-property: /*background-color,*/ width;
-
-
-  /*
-  display: flex;
-  flex-direction: row;
-  */
-}
-
-#navigator-toolbox > * {
-  /*display: none;*/
-}
-
-#navigator-toolbox:hover {
-  /*background-color: rgba(95, 30, 255, 0.75) !important;*/
-  max-width: 69%;
-  width: var(--user-navigator-width-visible);
-}
-
-#navigator-toolbox:hover > * {
-  display: inital;
-}
-
-/* Window button and Tab bar */
-#titlebar {
-/*   display: none; */
-  order: 1;
-}
-
-/* Window controls container */
-.titlebar-buttonbox-container {
-  position: absolute;
-  top: 0;
-  padding: var(--user-window-controls-padding);
-  margin-left: calc(-1 * calc(var(--user-window-padding) - var(--user-navigator-width-hidden)));
-}
-
-.titlebar-buttonbox-container > .titlebar-buttonbox {
-  margin: 0 !important;
-}
-
-/* Tabs bar */
-#TabsToolbar {
-  /*display: none;*/
-  display: flex;
-  flex-direction: column;
-  transition: display 1s ease-in;
-}
-
-#navigator-toolbox:hover #TabsToolbar {
-  display: flex;
-}
-
-#TabsToolbar-customization-target {
-  display: flex;
-  flex-direction: column;
-}
-
-/* vertical tabs */
-/*.tabbrowser-tab {
-  max-height: 50px;
-}*/
-
-/* Address and Control bar */
-#nav-bar {
-  /*display: none;*/
-  background-color: transparent !important;
-  order: 0;
-  margin-top: calc(calc(2 * var(--user-window-controls-padding)) + var(--user-window-controls-height)); 
-}
-
-/* Bookmarks bar */
-#PersonalToolbar {
-  display: none;
-}
-
-/* Page container */
-#browser {
-  /* spacing between page view and nav, window */
-  margin-top: var(--user-window-padding);
-  margin-right: var(--user-window-padding);
-  margin-bottom: var(--user-window-padding);
-  margin-left: 0px;
-  transition: filter var(--user-navigator-trans-time) ease-in;
-}
-
-#navigator-toolbox:hover ~ #browser {
-  filter: blur(3px);
-}
-
+/* -- Fullscreen */
 /* add padding back if in fullscreen mode */
 #main-window[inFullscreen="true"] #browser {
  margin-left: var(--user-window-padding);
 }
 
+/* rendered as `<html:body>` */
+/*body {}*/
+
+
+/* MARK -- Browser */
+
+/** 
+ * one of the parent containers for "this tab's" browser, quote mine.
+ * This is the only parent with a background set, meaning this is the
+ * background visible behind the browser, but in front of the window.
+ * i.e. this plus the `browser` element make up the "screen flash" element 
+ * that SPAs aim to subvert
+ * Visible in situations like:
+ *  - with rounded browser corners
+ *  - before any initial page load
+ *  - refreshing a just-focused tab that has been in the bg for a while
+ */
 #tabbrowser-tabpanels {
-  background: transparent !important;
+  /* gimme my sweet wallpaper instead of a screen flash, thank you */
+  background-color: transparent !important;
 }
+
+/** 
+ * `#browser` is the main container,
+ * `browser` renders the webpage
+ */
+#browser {
+  margin-top: var(--user-window-padding);
+  margin-right: var(--user-window-padding);
+  margin-bottom: var(--user-window-padding);
+  margin-left: var(--user-window-padding);
+  
+  /*
+  /* TODO: find a way to blur the browser when:
+   *    - the sidebar is open
+  transition: filter var(--user-navigator-trans-time) cubic-bezier(1,.21,.94,.5);
+  filter: var(--user-browser-filter);
+  */
+}
+browser {
+  border-radius: var(--user-browser-border-radius) !important;
+}
+
+/*
+ * ~FIXME:~ still blurs when window buttons are hovered
+ *  it's working now? one of the other changes must have fixed it
+ * NOTE: This still does not apply to menus, but they need a script anyways
+ */
+#navigator-toolbox:hover ~ #browser,
+#navigator-toolbox:focus-within ~ #browser {
+  filter: blur(3px);
+}
+
+
+/* MARK -- Toolbar */
+
+/* top container */
+#navigator-toolbox {
+  /*background: transparent !important;*/
+  /*background: var(--user-sidebar-bg) !important;*/
+  /*border-bottom: none !important;*/
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  margin-top:    var(--user-window-padding);
+  margin-bottom: var(--user-window-padding);
+  padding-right: var(--user-window-padding);
+
+  max-width: 69%;
+  width: var(--user-navigator-width);
+
+  /*
+  transition: var(--user-navigator-trans-time) ease-in;
+  transition-delay: 0.25s;
+  transition-property: opacity, width;
+  */
+}
+
+
+/* toggle visibility (hide-and-show) */
+/* NOTE: I think 'updating' the variables will need to be done 
+ * within script.
+ * These 'overrides' are only local, so the ones where the sidebar is
+ * directly selected work, but things like the menus don't.
+ */
+#navigator-toolbox:hover,
+#navigator-toolbox:focus-within {
+  --user-navigator-width: var(--user-navigator-width-visible) !important;
+  /* FIXME: `:focus-within` only works when the width is set directly; 
+   *    updating the variable above doesn't show the sidebar -- albeit this
+   *    is CSS working as intended. Variables declared within a scope only
+   *    exist in that scope. Thus, a script is needed to update the 
+   *    property set on the root element.
+   */
+  width: var(--user-navigator-width-visible) !important;
+}
+toolbarbutton[open="true"] {
+  --user-navigator-width: var(--user-navigator-width-visible) !important;
+}
+/*#navigator-toolbox:not(:hover),
+#navigator-toolbox .titlebar-buttonbox-container:hover {*/
+#navigator-toolbox:not(:hover) {
+  --user-navigator-width: var(--user-navigator-width-hidden) !important;
+}
+#navigator-toolbox #urlbar:is([focused="true"], [open]) {
+  --user-navigator-width: var(--user-navigator-width-visible) !important;
+}
+#appMenu-popup[panelopen="true"],
+#appMenu-popup:hover {
+  --user-navigator-width: var(--user-navigator-width-visible) !important;
+} 
+
+
+/* MARK -- Titlebar */
+
+/* container for Tab Bar and Window Buttons */
+#titlebar {
+  order: 1;
+}
+
+
+/* MARK -- Titlebar - Window Buttons */
+.titlebar-buttonbox-container,
+.titlebar-buttonbox-container:hover {
+  -moz-window-dragging: no-drag;
+  /* FIXME: the `no-drag` works, but the cursor still renders a hand */
+  cursor: default !important;
+}
+.titlebar-buttonbox-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: var(--user-window-controls-padding);
+  pointer-events: none;
+}
+.titlebar-buttonbox-container > .titlebar-buttonbox {
+  margin: 0 !important;
+}
+/* don't allow dragging around the window buttons */
+/* it's not necessarily terrible, but it's a little glitchy, and
+ * it could result in some unintended actions.
+ * generally, I don't think anyone will be aiming there to move the window.
+ */
+
+
+/* MARK -- Navbar */
+#nav-bar {
+  background-color: transparent !important;
+  order: 0;
+}
+
+/* Back button */
+/*
+#back-button {}
+*/
+/* Forward button */
+/*
+#forward-button {}
+*/
+/* Stop / Reload button */
+/*
+#stop-reload-button {}
+*/
+/* URLbar */
+/*
+#urlbar-container {}
+*/
+/* Extensions Menu */
+/* 
+#unified-extensions-button {}
+#unified-extensions-panel {}
+*/
+/* Overflow Menu */
+#nav-bar-overflow-button {
+  display: none !important;
+}
+/*
+#widget-overflow {}
+*/
+/* Application Menu */
+/*
+#PanelUI-menu-button {}
+#appMenu-popup {} 
+*/
+
+
+/* MARK -- Bookmarksbar */
+#PersonalToolbar {
+  display: none;
+}
+
+
+/* MARK -- DEBUG */
+/* basically a quick check for syntax errors */
+
+/*
+browser {
+  background-color: #0f0 !important;
+}
+*/
