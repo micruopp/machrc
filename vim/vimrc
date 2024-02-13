@@ -1,0 +1,4 @@
+" .vimrc
+
+source $MACHRC_DIR/vim/opts.vim
+source $MACHRC_DIR/vim/remaps.vim
