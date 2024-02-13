@@ -128,11 +128,16 @@ preexec() {
 
 # Extras
 
-# Helper to quickly edit this file
 mac() {
   $EDITOR $MACHRC_DIR/zsh/zshrc && source $MACHRC_DIR/zsh/zshrc
 }
 
+cs() {
+  cd $@
+  clear
+  echo -e $italon$PWD$italoff
+  ls -l
+}
 
 # just kind of a test script
 # you know, to see how things are working
