@@ -1,5 +1,4 @@
 " remaps.vim
-
 """ Keyboard mappings
 
 " Motions -- search
@@ -50,6 +49,10 @@ xnoremap <Leader>p  "_dP
 " Motions -- quit
 nnoremap QQ   <Cmd>q<CR>
 nnoremap QA   <Cmd>qa<CR>
+
+" Buffers -- jumping
+nnoremap <Leader><Tab>  <Cmd>bn<CR>
+nnoremap <Leader>`      <Cmd>bp<CR>
 
 " File explorer shortcuts
 nnoremap <Leader>ee <Cmd>Ex<CR>
