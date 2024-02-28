@@ -128,6 +128,8 @@ preexec() {
 
 # Extras
 
+alias vi=$EDITOR
+
 mac() {
   $EDITOR $MACHRC_DIR/zsh/zshrc && source $MACHRC_DIR/zsh/zshrc
 }
@@ -137,6 +139,10 @@ cs() {
   clear
   echo -e $italon$PWD$italoff
   ls -l
+}
+
+cl() {
+  clear
 }
 
 # just kind of a test script
