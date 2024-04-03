@@ -160,3 +160,7 @@ wow() {
   styled_message=$blinkon$boldon$italon$fgyellow$message$resetall
   echo $styled_message
 }
+
+
+# asdf
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
