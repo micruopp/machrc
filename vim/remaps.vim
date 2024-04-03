@@ -58,6 +58,8 @@ nnoremap QA   <Cmd>qa<CR>
 nnoremap <Leader><Tab>  <Cmd>bn<CR>
 nnoremap <Leader>`      <Cmd>bp<CR>
 
+" System clipboard
+vnoremap  <Leader>y     "*y
 " File explorer shortcuts
 nnoremap <Leader>ee <Cmd>Ex<CR>
 
