@@ -22,13 +22,13 @@ set ruler
 " Change colorscheme
 colorscheme peachpuff
 " xterm-256-color-chart: https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
-hi Normal guibg=NONE guifg=15 ctermbg=NONE ctermfg=15
+hi Normal ctermbg=NONE ctermfg=15
 "hi StatusLine ctermbg=59 ctermfg=56
 hi StatusLine ctermbg=33 ctermfg=223
 
 " transparency isn't working
 "hi EndOfBuffer ctermfg=NONE guifg=NONE
-hi EndOfBuffer ctermfg=69 guifg=69
+hi EndOfBuffer ctermfg=69
 
 " Default tab settings
 set tabstop=2
