@@ -1,0 +1,45 @@
+# .zshenv
+# edits to $PATH and exporting some other variables
+#
+# https://zsh.sourceforge.io/Intro/intro_3.html
+# > `.zshenv' is sourced on all invocations of the shell, unless the -f option is set. It should contain commands to set the command search path [(i.e. your $PATH)], plus other important environment variables. `.zshenv' should not contain commands that produce output or assume the shell is attached to a tty. (I think I read this about .zshenv, actually --> Another way of putting it: don't expect the shell to be connected to a tty when `.zlogin` is sourced.)
+
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# iCloud root
+export CLOUD="/Users/michalruopp/Library/Mobile\ Documents/com\~apple\~CloudDocs"
+
+# TODO: Z-shell uses $ZDOTDIR for this
+#   Other shells may have a similar thing
+#   There's also $XDG_CONFIG or whatever
+#   Lastly, I do think I want the install directory to be somewhere outside
+#    of the ~/Developer folder. ~/Developer is for development, u no?
+export DOTFILES="$HOME/Developer/Dotfiles"
+
+export EDITOR=nvim
+export MACHRC_DIR=/Users/$USER/Developer/machrc
+export MACHRC=/Users/$USER/Developer/machrc
+
+
+# TODO: refactor exports to .zshenv
+# TODO: Shell is already an env variable, just parse the last segment
+#       - Check what is on Linux machines (if it exists and it's format)
+export SHELL_NAME="zsh"
+#export CONFIG_SRC="/Users/$USER/lib/config/$SHELL_NAME/"
+
+#source "$CONFIG_SRC/zshrc"
+
+
+
+# ---------------
+#
+# zsh/zshenv
+
+# Some meta info about the config files
+export SHELL_NAME="zsh"
+#export CONFIG_SRC="/Users/$USER/lib/config/$SHELL_NAME/"
+
+# Cloud storage location
+export CLOUD_DIR="/Users/$USER/Library/Mobile\ Documents/com\~apple\~CloudDocs"
+export CLOUD="/Users/michalruopp/Library/Mobile\ Documents/com\~apple\~CloudDocs"
