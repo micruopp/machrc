@@ -3,6 +3,8 @@
 
 #. $MACHRC_DIR/zsh/ansi.zsh
 
+UNI_LAMBDA="λ"
+
 # IMPORTANT!
 setopt promptsubst
 
@@ -24,10 +26,12 @@ vcs_info_wrapper() {
   fi
 }
 
-local vcs_format="%{\e[39m%}%b%{$(tput sgr0)%} %{\e[1;36m%}(%s)%{$(tput sgr0)%}"
-#local nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
-local nvcs_format=""
-local action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
+#vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
+vcs_format=" $UNI_LAMBDA %b%{$fgyellow%}(%s)%{$resetall%} "
+#vcs_format=" %b%{$(tput setab 5)%}(%s) "
+#nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
+nvcs_format=""
+action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
 #zstyle ':vcs_info:*' actionformats '...|%F{1}%a%F{5}]%f '
 
 zstyle ':vcs_info:*' actionsformats $action_format
@@ -38,11 +42,12 @@ local term_width
 # zsh has 1 column of padding on the right
 (( term_width = $COLUMNS - 1 ))
 
-local lpad="        "
-local rpad=" "
+lpad="        "
+#rpad=" "
+rpad=""
 
-local lpad_width=$(echo -n $lpad | wc -m)
-local rpad_width=$(echo -n $rpad | wc -m)
+lpad_width=$(echo -n $lpad | wc -m)
+rpad_width=$(echo -n $rpad | wc -m)
 
 l_prompt() {
   local mach='$(echo -ne "$ITALON$USER@$(hostname -s)$ITALOFF")'
@@ -53,7 +58,9 @@ l_prompt() {
   #   I think it's a prompt-only thing:
   #   - https://stackoverflow.com/questions/28799198/zsh-inserts-extra-spaces-when-performing-searches-and-completion
   #   - https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
-  local p=$'%{$boldon%}>_ %{$boldoff%}'
+  #local p=$'%{$boldon%}>_ %{$boldoff%}'
+  local p=$'%{$boldon%}>_ %{$resetall%}'
+  #local p=$'>_ %{$revoff%} '
 
 
   # output
@@ -71,7 +78,13 @@ r_prompt() {
   local vcs_msg=$(echo -ne $vcs_info_msg_0_)
   #printf "%s%s%s" $styled_date $p $rpad
   #printf "%s%s%s" $vcs $p $rpad
-  printf "%s%s%s" $vcs_msg $p $rpad
+  #printf "%s%s%s" $vcs_msg $p $rpad
+  #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
+  printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" "" $p $rpad
+}
+
+__get_cwd() {
+  echo -n "${PWD##*/}"
 }
 
 update_rprompt() {
@@ -81,11 +94,13 @@ add-zsh-hook precmd update_rprompt
 
 precmd() {
   vcs_info
-  print "\n"
+  #print "\n"
+  print ""
 }
 
 PROMPT=$(l_prompt)
-RPROMPT="$(r_prompt)"
+#RPROMPT="$(r_prompt)"
+RPROMPT=$(r_prompt)
 
 preexec() {
   local now=$(date +"%H:%M:%S%z")
