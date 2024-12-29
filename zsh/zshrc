@@ -18,7 +18,13 @@ export LS_COLORS="$LS_COLORS:di=0;34:ln=0;93:ex=0;31:"
 # TODO: refactor third-party resources to separate file
 # Third-party code
 # asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+# Silicon Homebrew path
+#. /opt/homebrew/opt/asdf/libexec/asdf.sh
+# asdf
+# Intel Homebrew path
+. /usr/local/opt/asdf/libexec/asdf.sh
 
 # autojump
+# Silicon Homebrew path
+# TODO: refactor out the Homebrew path to a reusable variable
 [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
