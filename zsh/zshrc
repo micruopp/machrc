@@ -7,6 +7,8 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 #export LS_COLORS="$LS_COLORS:di=0;36:ln=0;93:ex=0;31:"
 export LS_COLORS="$LS_COLORS:di=0;34:ln=0;93:ex=0;31:"
 
+. $MACHRC_DIR/sh/git.sh
+
 . $MACHRC_DIR/zsh/ansi.zsh
 . $MACHRC_DIR/zsh/aliases.zsh
 . $MACHRC_DIR/zsh/apparatus.zsh
