@@ -1,52 +1,25 @@
-# https://zsh.sourceforge.io/Intro/intro_14.html
-# https://aperiodic.net/pip/prompt/
+#!/bin/zsh
+
+# prompt.zsh
+# @desc Prompt setup for the z-shell
+#
+# @resources
+# Resources:
+# - https://zsh.sourceforge.io/Intro/intro_14.html
+# - https://aperiodic.net/pip/prompt/
+
 
 #. $MACHRC_DIR/zsh/ansi.zsh
 
 UNI_LAMBDA="λ"
 
-# IMPORTANT!
-setopt promptsubst
-
-autoload -Uz compinit && compinit
-
-# Version control
-autoload -Uz vcs_info
-
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' get-revision true
-
-# TODO: display number of added, modified, unadded, removed files
-#   oh-my-zsh parses `git status --porcelain` to display file info
-#   - https://stackoverflow.com/questions/9915543/git-list-of-new-modified-deleted-files
-#   - https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
-
-# enabled systems
-zstyle ':vcs_info:*' enable git cvs svn hg fossil
-
-vcs_info_wrapper() {
-  vcs_info
-  if [ -n "$vcs_info_msg_0_" ]; then
-    echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
-  fi
-}
-
-#vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
-vcs_format=" $UNI_LAMBDA %b %u%c %{$fgyellow%}(%s)%{$resetall%} "
-#vcs_format=" %b%{$(tput setab 5)%}(%s) "
-#nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
-nvcs_format=""
-action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
-#zstyle ':vcs_info:*' actionformats '...|%F{1}%a%F{5}]%f '
-
-zstyle ':vcs_info:*' actionsformats $action_format
-zstyle ':vcs_info:*' formats $vcs_format
-zstyle ':vcs_info:*' nvcsformats $nvcs_format
-
-
+# TODO: probably refactor this to ... maybe `git.sh`? ...
+#   or maybe I make a separate `vcs.sh` that this would better fit
 prompt.git_count_changes() {
   # Get the git status output in porcelain format
-  git_status=$(git status --porcelain)
+  local git_status=$(git status --porcelain)
+
+  local output_message=""
 
   # Initialize counters
   staged=0
@@ -81,9 +54,73 @@ prompt.git_count_changes() {
       fi
   done <<< "$git_status"
 
+  # TODO: some logic based on each count to create an output string
+#
+#  if [[ $untracked -ne 0 ]]; then
+#    echo "? $untracked"
+#  fi
+#
+#  if [[ $ignored -ne 0 ]]; then
+#    echo "! $ignored"
+#  fi
+
   # Print the counts
-  echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
+  #echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
+  output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored"
+
+  echo "$output_message"
 }
+alias parse_git_status="prompt.git_count_changes"
+
+vcs.git_status_hook() {
+  local git_status_info
+  git_status_info=$(parse_git_status)
+  hook_com[gitstatus]="$output_message"
+}
+
+# IMPORTANT!
+setopt promptsubst
+
+autoload -Uz compinit && compinit
+
+# Version control
+autoload -Uz vcs_info
+
+# Hooks
+zstyle ':vcs_info:git:*' hooks vcs.git_status_hook
+
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' get-revision true
+
+# TODO: display number of added, modified, unadded, removed files
+#   oh-my-zsh parses `git status --porcelain` to display file info
+#   - https://stackoverflow.com/questions/9915543/git-list-of-new-modified-deleted-files
+#   - https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
+
+# enabled systems
+zstyle ':vcs_info:*' enable git cvs svn hg fossil
+
+vcs_info_wrapper() {
+  vcs_info
+  if [ -n "$vcs_info_msg_0_" ]; then
+    echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
+  fi
+}
+
+GIT_STATUS="$(prompt.git_count_changes)"
+#vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
+#vcs_format="$UNI_LAMBDA %b : $(prompt.git_count_changes) %{$fgyellow%}(%s)%{$resetall%}"
+vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
+#vcs_format=" %b%{$(tput setab 5)%}(%s) "
+#nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
+nvcs_format=""
+action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
+#zstyle ':vcs_info:*' actionformats '...|%F{1}%a%F{5}]%f '
+
+zstyle ':vcs_info:*' actionsformats $action_format
+zstyle ':vcs_info:*' formats $vcs_format
+zstyle ':vcs_info:*' nvcsformats $nvcs_format
+
 
 
 local term_width
@@ -122,13 +159,14 @@ r_prompt() {
   vcs_info
   local now=$(date +"%H:%M:%S%z")
   local styled_date="%{$ITALON%}${now}%{$ITALOFF%}"
-  local p="%{$boldon%} <<%{$boldoff%}"
+  local p="%{$boldon%}<<%{$boldoff%}"
   local vcs_msg=$(echo -ne $vcs_info_msg_0_)
   #printf "%s%s%s" $styled_date $p $rpad
   #printf "%s%s%s" $vcs $p $rpad
   #printf "%s%s%s" $vcs_msg $p $rpad
   #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
-  printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
+  #printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
+  printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '' $p $rpad
 }
 
 __get_cwd() {
@@ -136,19 +174,25 @@ __get_cwd() {
 }
 
 update_rprompt() {
+  GIT_STATUS="$(prompt.git_count_changes)"
+  vcs_info
   RPROMPT="$(r_prompt)"
+
+  #RPROMPT="something$(prompt.git_count_changes)"
 }
 add-zsh-hook precmd update_rprompt
 
 precmd() {
+  GIT_STATUS="$(prompt.git_count_changes)"
   vcs_info
+  #RPROMPT=$(r_prompt)
   #print "\n"
   print ""
 }
 
 PROMPT=$(l_prompt)
 #RPROMPT="$(r_prompt)"
-RPROMPT=$(r_prompt)
+#RPROMPT=$(r_prompt)
 
 preexec() {
   local now=$(date +"%H:%M:%S%z")
