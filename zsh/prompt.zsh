@@ -8,8 +8,13 @@ UNI_LAMBDA="λ"
 # IMPORTANT!
 setopt promptsubst
 
+autoload -Uz compinit && compinit
+
 # Version control
 autoload -Uz vcs_info
+
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' get-revision true
 
 # TODO: display number of added, modified, unadded, removed files
 #   oh-my-zsh parses `git status --porcelain` to display file info
@@ -27,7 +32,7 @@ vcs_info_wrapper() {
 }
 
 #vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
-vcs_format=" $UNI_LAMBDA %b%{$fgyellow%}(%s)%{$resetall%} "
+vcs_format=" $UNI_LAMBDA %b %u%c %{$fgyellow%}(%s)%{$resetall%} "
 #vcs_format=" %b%{$(tput setab 5)%}(%s) "
 #nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
 nvcs_format=""
@@ -37,6 +42,49 @@ action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
 zstyle ':vcs_info:*' actionsformats $action_format
 zstyle ':vcs_info:*' formats $vcs_format
 zstyle ':vcs_info:*' nvcsformats $nvcs_format
+
+
+prompt.git_count_changes() {
+  # Get the git status output in porcelain format
+  git_status=$(git status --porcelain)
+
+  # Initialize counters
+  staged=0
+  unstaged=0
+  untracked=0
+  ignored=0
+
+  # Parse each line of the git status output
+  while IFS= read -r line; do
+      # Extract the staged and unstaged status (first and second columns)
+      staged_status="${line:0:1}"
+      unstaged_status="${line:1:1}"
+
+      # Count staged changes (any non-space character in the first column except '?' or '!')
+      if [[ "$staged_status" != " " && "$staged_status" != "?" && "$staged_status" != "!" ]]; then
+          ((staged++))
+      fi
+
+      # Count unstaged changes (any non-space character in the second column except '?' or '!')
+      if [[ "$unstaged_status" != " " && "$unstaged_status" != "?" && "$unstaged_status" != "!" ]]; then
+          ((unstaged++))
+      fi
+
+      # Count untracked files (lines starting with '??')
+      if [[ "$line" == "?? "* ]]; then
+          ((untracked++))
+      fi
+
+      # Count ignored files (lines starting with '!!')
+      if [[ "$line" == "!! "* ]]; then
+          ((ignored++))
+      fi
+  done <<< "$git_status"
+
+  # Print the counts
+  echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
+}
+
 
 local term_width
 # zsh has 1 column of padding on the right
@@ -80,7 +128,7 @@ r_prompt() {
   #printf "%s%s%s" $vcs $p $rpad
   #printf "%s%s%s" $vcs_msg $p $rpad
   #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
-  printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" "" $p $rpad
+  printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
 }
 
 __get_cwd() {

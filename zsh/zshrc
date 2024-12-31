@@ -1,4 +1,6 @@
-# .zshrc
+# zsh/zshrc.zsh
+# 
+# @desc z-shell run commands, sourced in interactive shells
 #
 # `.zshrc' is sourced in interactive shells. It should contain commands to set up aliases, functions, options, key bindings, etc.
 # https://zsh.sourceforge.io/Intro/intro_3.html
@@ -7,13 +9,15 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 #export LS_COLORS="$LS_COLORS:di=0;36:ln=0;93:ex=0;31:"
 export LS_COLORS="$LS_COLORS:di=0;34:ln=0;93:ex=0;31:"
 
-. $MACHRC_DIR/zsh/ansi.zsh
-. $MACHRC_DIR/zsh/aliases.zsh
-. $MACHRC_DIR/zsh/apparatus.zsh
-. $MACHRC_DIR/zsh/prompt.zsh
-. $MACHRC_DIR/zsh/test.zsh
-. $MACHRC_DIR/zsh/tty.zsh
-. $MACHRC_DIR/zsh/web.zsh
+. $MACHRC/sh/git.sh
+
+. $MACHRC/zsh/ansi.zsh
+. $MACHRC/zsh/aliases.zsh
+. $MACHRC/zsh/apparatus.zsh
+. $MACHRC/zsh/prompt.zsh
+. $MACHRC/zsh/test.zsh
+. $MACHRC/zsh/tty.zsh
+#. $MACHRC/zsh/web.zsh
 
 # TODO: refactor third-party resources to separate file
 # Third-party code
