@@ -19,16 +19,16 @@ export LS_COLORS="$LS_COLORS:di=0;34:ln=0;93:ex=0;31:"
 . $MACHRC_DIR/zsh/tty.zsh
 #. $MACHRC_DIR/zsh/web.zsh
 
-# TODO: refactor third-party resources to separate file
-# Third-party code
-# asdf
-# Silicon Homebrew path
-#. /opt/homebrew/opt/asdf/libexec/asdf.sh
-# asdf
-# Intel Homebrew path
-. /usr/local/opt/asdf/libexec/asdf.sh
+os_name="$(uname -s)"
+arch_name="$(uname -p)"
 
-# autojump
-# Silicon Homebrew path
-# TODO: refactor out the Homebrew path to a reusable variable
-[ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
+# Could I name the files <$os_name>_<$arch_name>.sh so that I don't need to check anything? Just get the values and source the file?
+# Don't know how portable the above would be... Does `uname` behave the same on Linux? Windows?
+
+if [[ "$os_name" = "Darwin" ]]; then
+  if [[ "$arch_name" = "arm" ]]; then
+    . "$MACHRC_DIR/macos/apple_arm.sh"
+  elif [[ "$arch_name" = "x86" ]]; then
+    . "$MACHRC_DIR/macos/apple_x86.sh"
+  fi
+fi

@@ -176,7 +176,7 @@ __get_cwd() {
 update_rprompt() {
   GIT_STATUS="$(prompt.git_count_changes)"
   vcs_info
-  RPROMPT="$(r_prompt)"
+  RPROMPT="$(r_prompt) $(parse_git_status)"
 
   #RPROMPT="something$(prompt.git_count_changes)"
 }
