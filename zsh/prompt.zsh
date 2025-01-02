@@ -66,7 +66,7 @@ prompt.git_count_changes() {
 
   # Print the counts
   #echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
-  output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored"
+  output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored%{$resetall%}"
 
   echo "$output_message"
 }
