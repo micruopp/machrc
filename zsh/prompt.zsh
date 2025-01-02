@@ -66,7 +66,8 @@ prompt.git_count_changes() {
 
   # Print the counts
   #echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
-  output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored"
+  #output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored%{$resetall%}"
+  output_message="$fggreen+$staged $fgred-$unstaged $fgmagenta?$untracked $fgpurple!$ignored$resetall"
 
   echo "$output_message"
 }
@@ -109,8 +110,10 @@ vcs_info_wrapper() {
 
 GIT_STATUS="$(prompt.git_count_changes)"
 #vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
+#vcs_format="$UNI_LAMBDA %b %{$fgyellow%}(%s)%{$resetall%}"
+vcs_format="$UNI_LAMBDA %{$fgyellow%}(%s)%{$fgcyan%}%b%{$resetall%}"
 #vcs_format="$UNI_LAMBDA %b : $(prompt.git_count_changes) %{$fgyellow%}(%s)%{$resetall%}"
-vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
+#vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
 #vcs_format=" %b%{$(tput setab 5)%}(%s) "
 #nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
 nvcs_format=""
@@ -161,12 +164,15 @@ r_prompt() {
   local styled_date="%{$ITALON%}${now}%{$ITALOFF%}"
   local p="%{$boldon%}<<%{$boldoff%}"
   local vcs_msg=$(echo -ne $vcs_info_msg_0_)
+  local git_status="$(parse_git_status)"
   #printf "%s%s%s" $styled_date $p $rpad
   #printf "%s%s%s" $vcs $p $rpad
   #printf "%s%s%s" $vcs_msg $p $rpad
   #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
   #printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
-  printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '' $p $rpad
+  # LAST GOOD ONE BELOW
+  #printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" " $git_status" $p $rpad
+  printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" " " $p $rpad
 }
 
 __get_cwd() {
@@ -176,18 +182,27 @@ __get_cwd() {
 update_rprompt() {
   GIT_STATUS="$(prompt.git_count_changes)"
   vcs_info
-  RPROMPT="$(r_prompt) $(parse_git_status)"
+  #RPROMPT="$(r_prompt) $(parse_git_status)"
+  RPROMPT="$(r_prompt)"
 
   #RPROMPT="something$(prompt.git_count_changes)"
 }
 add-zsh-hook precmd update_rprompt
 
 precmd() {
-  GIT_STATUS="$(prompt.git_count_changes)"
-  vcs_info
+  #GIT_STATUS="$(prompt.git_count_changes)"
+  #vcs_info
   #RPROMPT=$(r_prompt)
-  #print "\n"
-  print ""
+  print "\n"
+
+  local cols=$(tput cols)                # Get terminal width
+  local git_status=$(parse_git_status)  # Get git status
+  local preprompt="$git_status $boldon<<$boldoff"
+  local status_length=${#preprompt}    # Calculate length of status text
+  local padding=$((cols - status_length)) # Calculate padding for alignment
+
+  # Print the git status right-aligned
+  printf "%${padding}s%s\n" "" "$preprompt"
 }
 
 PROMPT=$(l_prompt)
