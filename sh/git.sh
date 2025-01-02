@@ -10,7 +10,7 @@ gitac() {
 }
 
 gitcm() {
-  git commit -m "\"$1\""
+  git commit -m "$1"
 }
 
 gitlo() {
