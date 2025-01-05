@@ -14,9 +14,10 @@ export LS_COLORS="$LS_COLORS:di=0;34:ln=0;93:ex=0;31:"
 . $MACHRC_DIR/zsh/ansi.zsh
 . $MACHRC_DIR/zsh/aliases.zsh
 . $MACHRC_DIR/zsh/apparatus.zsh
-. $MACHRC_DIR/zsh/prompt.zsh
-. $MACHRC_DIR/zsh/test.zsh
+. "$MACHRC_DIR/zsh/prompt/prompt.zsh"
+#. $MACHRC_DIR/zsh/test.zsh
 . $MACHRC_DIR/zsh/tty.zsh
+. "$MACHRC_DIR/zsh/color.zsh"
 #. $MACHRC_DIR/zsh/web.zsh
 
 os_name="$(uname -s)"
@@ -26,8 +27,12 @@ arch_name="$(uname -p)"
 # Don't know how portable the above would be... Does `uname` behave the same on Linux? Windows?
 
 if [[ "$os_name" = "Darwin" ]]; then
+  
+  # Apple Silicon
   if [[ "$arch_name" = "arm" ]]; then
     . "$MACHRC_DIR/macos/apple_arm.sh"
+
+  # Apple Intel
   elif [[ "$arch_name" = "x86" ]]; then
     . "$MACHRC_DIR/macos/apple_x86.sh"
   fi
