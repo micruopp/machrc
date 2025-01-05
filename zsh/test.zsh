@@ -7,8 +7,9 @@ __print_color() {
 }
 
 __test_256_color() {
-  echo -n "\n\t"
+  #echo -n "\n\t"
   
+  # Standard 16
   echo "$(tput bold)ANSI (standard)$(tput sgr0)"
   echo -n "\t"
   for i in {0..15}; do
@@ -21,6 +22,7 @@ __test_256_color() {
 
   echo -n "\n\t"
 
+  # 256 colors (8-bit)
   echo "$(tput bold)256 (8-bit)$(tput sgr0)"
   echo -n "\t"
   for i in {16..231}; do
@@ -45,7 +47,7 @@ __test_256_color() {
       fi
   done
 
-  echo -n "\n"
+  #echo -n "\n"
 }
 alias 256="__test_256_color"
 
