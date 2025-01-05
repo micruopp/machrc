@@ -8,6 +8,9 @@
 # TODO: Homebrew sets env variables, use those instead of separate files,
 #   assuming the rest of the path is the same between systems
 
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
