@@ -1,14 +1,36 @@
 echo "You didn't write the install script yet, dummy."
 
 # Installation
-#
-# 1. Package manager
+# 
+# x. Zsh
+#   - Link .zshenv
+#   - Link .zshrc
+#   - Link .zlogin
+#   - Link .zlogout
+#   
+# x. Package manager
 #   - Homebrew
 #   - MacPorts
 #
-# - asdf
+# x. asdf
+#   - Link root .tool-versions
 #
-# n. Link source files
-#   - .zshrc, .zlogin, .zlogout
-#   - .vimrc, <neovim folder>
-#   - .tool-versions
+# x. Vim
+#   - Link .vimrc
+#
+# x. Neovim
+#   - 
+#
+# x. macOS
+#   - Terminal.app
+#     - Set profiles
+#   - System settings
+#     - Set Dock preferences
+#     - Set Menu bar preferences
+#   - Web browser (Firefox)
+#   - Web browser (Chromium)
+#
+# x. Ubuntu Server
+#   - Bash
+#     - Link .bashrc
+#     - Link .bash_profile
