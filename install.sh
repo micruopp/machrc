@@ -4,8 +4,11 @@ echo "You didn't write the install script yet, dummy."
 #
 # 1. Dependencies
 #   - Xcode developer tools
-#   - Git
 #   - Homebrew
+#   - MAS
+#   - Xcode
+#   - Git
+#   - Rectangle (window manager)
 # 
 # x. Zsh
 #   - Link .zshenv
