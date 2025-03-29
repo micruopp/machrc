@@ -1,6 +1,11 @@
 echo "You didn't write the install script yet, dummy."
 
 # Installation
+#
+# 1. Dependencies
+#   - Xcode developer tools
+#   - Git
+#   - Homebrew
 # 
 # x. Zsh
 #   - Link .zshenv
