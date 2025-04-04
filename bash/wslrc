@@ -1,0 +1,171 @@
+
+alias la="ls -la --color=always"
+alias ll="ls -l --color=always"
+
+open-in-browser() {
+  # NOTE: this is for Windows + WSL
+  cmd.exe /C start $1 &>/dev/null
+  # where $1 is a valid URL
+}
+
+#idk() {
+  #vim ~/.wslrc && source ~/.wslrc
+#}
+
+c() {
+  cd $1
+  ls -l --color=always
+}
+
+
+# ===============
+# PROMPT
+# ===============
+
+source /etc/bash_completion.d/git-prompt
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWCOLORHINTS=1
+export GIT_PS1_SHOWUPSTREAM="auto"
+
+PS1=""
+PS0="\n"
+
+# add a blank line before the prompt, but only if it's not a fresh screen
+#   that is, it's not a new terminal and it hasn't been `clear`ed
+prompt_add_blank_lin() {
+  if [[ $ADD_BLANK_LINE = 1 ]]; then
+    echo ""
+  fi
+  ADD_BLANK_LINE=1
+}
+
+check_if_cmd_is_clear() {
+  if [[ "$BASH_COMMAND" == "clear" ]]; then
+    ADD_BLANK_LINE=0
+  fi
+}
+
+trap 'check_if_cmd_is_clear' DEBUG
+PROMPT_COMMAND='prompt_add_blank_line'
+
+ADD_BLANK_LINE=0
+
+
+# ===============
+# Git aliases and helpers
+# ===============
+
+ggraph() {
+  git log --all --decorate --oneline --graph
+}
+
+gbranch() {
+  git -c color.branch=always branch -a | grep -v "remote"
+}
+
+
+# ===============
+# Node.js aliases and helpers
+# ===============
+
+npm-clean() {
+  rm -rf ./node_modules
+  rm ./package-lock.json
+}
+
+view_node_compatibility() {
+  # This isn't a perfect soltuion, but it gets the job done
+  # e.g., it doesn't seem to match something like:
+  # ```
+  # "node": {
+  #   ...
+  # }
+  # ```
+  # source: https://stackoverflow.com/a/70950325,
+  #   https://stackoverflow.com/questions/42805913/how-to-find-what-node-version-a-project-supports
+  
+  grep -hoP '"node":.*' node_modules/*/package.json | sort
+}
+
+
+# ===============
+# Python aliases and helpers
+# ===============
+
+alias python="python3"
+alias py="python3"
+alias pip="pip3"
+
+PYENV_DIR="./.venv"
+
+pyenv() {
+  # https://docs.python.org/3/library/venv.html
+
+  # TODO: handle arguments so I can do pointed actions within a project dir
+  # - "rm" -- delete the venv folder
+  # - "create" -- create the venv
+  # - "activate" -- activate the venv
+  # - "deactivate" -- deactivate the venv
+  # TODO: also create shorthands for the above
+
+  if [ ! -d "$PYENV_DIR" ]; then
+    echo "Creating python virtual environment at $PYENV_DIR..."
+    python -m venv $PYENV_DIR
+  fi
+
+  if [ "$VIRTUAL_ENV" = "" ]; then
+    source "$PYENV_DIR/bin/activate"
+  else
+    deactivate
+  fi
+}
+
+pyinstall() {
+  if [ ! -d "$PYENV_DIR" ]; then
+    echo "Creating python virtual environment at $PYENV_DIR..."
+    python -m venv $PYENV_DIR
+  fi
+
+  if [ "$VIRTUAL_ENV" = "" ]; then
+    source "$PYENV_DIR/bin/activate"
+  fi
+
+  if [ -f "./requirements.txt" ]; then
+    pip install -r requirements.txt
+  else
+    echo "No requirements.txt found."
+  fi
+}
+
+
+# ===============
+# Excalidraw
+# ===============
+EXCALIDRAW_PID=""
+draw() {
+  local EXCALIDRAW_PATH=""
+  cd $EXCALIDRAW_PATH
+  npm run dev &
+  EXCALIDRAW_PID=$!
+  open-in-browser "http://localhost:21021"
+}
+
+draw-stop() {
+  kill -9 "$EXCALIDRAW_PID"
+}
+
+
+# ===============
+# Tests
+# ===============
+
+test_colors() {
+  printf "\e[0;30mBlack \e[1;30mbold Black \e[1;90mhigh intensity Black\n"
+  printf "\e[0;31mRed \e[1;31mbold Red \e[1;92mhigh intensity Red\n"
+  printf "\e[0;32mGreen \e[1;32mbold Green \e[1;92mhigh intensity Green\n"
+  printf "\e[0;33mYellow \e[1;33mbold Yellow \e[1;93mhigh intensity Yellow\n"
+  # Blue
+  # Purple
+  # Cyan
+  printf "\e[0;37mWhite \e[1;37mbold White \e[1;97mhigh intensity White\n"
+}
