@@ -7,3 +7,7 @@ local/
 # any local files i want to keep, like examples...
 # !local/*.sample
 
+
+.archive
+.zsh_history
+.zsh_sessions
