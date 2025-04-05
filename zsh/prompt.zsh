@@ -1,102 +1,49 @@
 #!/bin/zsh
 
-# prompt.zsh
+# @name prompt.zsh
 # @desc Prompt setup for the z-shell
-#
 # @resources
-# Resources:
 # - https://zsh.sourceforge.io/Intro/intro_14.html
 # - https://aperiodic.net/pip/prompt/
 
 
-#. $MACHRC_DIR/zsh/ansi.zsh
+
+# DEPENDENCIES
+# ============
+
+#source $MACHRC_DIR/zsh/ansi.zsh
+#source $MACHRC_DIR/zsh/git.zsh
+#source $MACHRC_DIR/zsh/vcs.zsh
+
+
+
+# CONSTANTS
+# =========
 
 UNI_LAMBDA="λ"
 
-# TODO: probably refactor this to ... maybe `git.sh`? ...
-#   or maybe I make a separate `vcs.sh` that this would better fit
-prompt.git_count_changes() {
-  # Get the git status output in porcelain format
-  local git_status=$(git status --porcelain)
+PROMPT_STRING=">"
+RPROMPT_STRING="<"
 
-  local output_message=""
+LEFT_PADDING_STRING="\t"
+RIGHT_PADDING_STRING=""
 
-  # Initialize counters
-  staged=0
-  unstaged=0
-  untracked=0
-  ignored=0
+#TERM_WIDTH
+# zsh has 1 column of padding on the right
+#(( TERM_WIDTH = $COLUMNS - 1 ))
 
-  # Parse each line of the git status output
-  while IFS= read -r line; do
-      # Extract the staged and unstaged status (first and second columns)
-      staged_status="${line:0:1}"
-      unstaged_status="${line:1:1}"
-
-      # Count staged changes (any non-space character in the first column except '?' or '!')
-      if [[ "$staged_status" != " " && "$staged_status" != "?" && "$staged_status" != "!" ]]; then
-          ((staged++))
-      fi
-
-      # Count unstaged changes (any non-space character in the second column except '?' or '!')
-      if [[ "$unstaged_status" != " " && "$unstaged_status" != "?" && "$unstaged_status" != "!" ]]; then
-          ((unstaged++))
-      fi
-
-      # Count untracked files (lines starting with '??')
-      if [[ "$line" == "?? "* ]]; then
-          ((untracked++))
-      fi
-
-      # Count ignored files (lines starting with '!!')
-      if [[ "$line" == "!! "* ]]; then
-          ((ignored++))
-      fi
-  done <<< "$git_status"
-
-  # TODO: some logic based on each count to create an output string
-#
-#  if [[ $untracked -ne 0 ]]; then
-#    echo "? $untracked"
-#  fi
-#
-#  if [[ $ignored -ne 0 ]]; then
-#    echo "! $ignored"
-#  fi
-
-  # Print the counts
-  #echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
-  #output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored%{$resetall%}"
-  output_message="$fggreen+$staged $fgred-$unstaged $fgmagenta?$untracked $fgpurple!$ignored$resetall"
-
-  echo "$output_message"
-}
-alias parse_git_status="prompt.git_count_changes"
-
-vcs.git_status_hook() {
-  local git_status_info
-  git_status_info=$(parse_git_status)
-  hook_com[gitstatus]="$output_message"
-}
+# V(ersion) C(ontrol) S(ystem)
+# ============================
 
 # IMPORTANT!
 setopt promptsubst
 
 autoload -Uz compinit && compinit
-
-# Version control
 autoload -Uz vcs_info
 
-# Hooks
 zstyle ':vcs_info:git:*' hooks vcs.git_status_hook
-
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' get-revision true
-
-# TODO: display number of added, modified, unadded, removed files
-#   oh-my-zsh parses `git status --porcelain` to display file info
-#   - https://stackoverflow.com/questions/9915543/git-list-of-new-modified-deleted-files
-#   - https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 
 # enabled systems
 zstyle ':vcs_info:*' enable git cvs svn hg fossil
@@ -108,17 +55,10 @@ vcs_info_wrapper() {
   fi
 }
 
-GIT_STATUS="$(prompt.git_count_changes)"
-#vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
-#vcs_format="$UNI_LAMBDA %b %{$fgyellow%}(%s)%{$resetall%}"
-vcs_format="$UNI_LAMBDA %{$fgyellow%}(%s)%{$fgcyan%}%b%{$resetall%}"
-#vcs_format="$UNI_LAMBDA %b : $(prompt.git_count_changes) %{$fgyellow%}(%s)%{$resetall%}"
-#vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
-#vcs_format=" %b%{$(tput setab 5)%}(%s) "
-#nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
+vcs_format="%{$fgyellow%}(%s)%{$fgcyan%}%b%{$resetall%}"
+#vcs_format="$fgyellow(%s)$fgcyan%b$resetall"
 nvcs_format=""
 action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
-#zstyle ':vcs_info:*' actionformats '...|%F{1}%a%F{5}]%f '
 
 zstyle ':vcs_info:*' actionsformats $action_format
 zstyle ':vcs_info:*' formats $vcs_format
@@ -126,115 +66,330 @@ zstyle ':vcs_info:*' nvcsformats $nvcs_format
 
 
 
-local term_width
-# zsh has 1 column of padding on the right
-(( term_width = $COLUMNS - 1 ))
+# PROMPT FUNCTIONS
+# ================
 
-lpad="        "
-#rpad=" "
-rpad=""
-
-lpad_width=$(echo -n $lpad | wc -m)
-rpad_width=$(echo -n $rpad | wc -m)
-
-l_prompt() {
-  local mach='$(echo -ne "$ITALON$USER@$(hostname -s)$ITALOFF")'
-  local dir='$(echo -ne "$ITALON${PWD/\/Users\/$USER/~}$ITALOFF")'
-  local vcs='$(echo -ne ${vcs_info_msg_0_})'
-  # for some reason, this places extra spacing after the right prompt unless
-  #   the escapes are wrapped in `%{ %}`... not sure
-  #   I think it's a prompt-only thing:
-  #   - https://stackoverflow.com/questions/28799198/zsh-inserts-extra-spaces-when-performing-searches-and-completion
-  #   - https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
-  #local p=$'%{$boldon%}>_ %{$boldoff%}'
-  local p=$'%{$boldon%}>_ %{$resetall%}'
-  #local p=$'>_ %{$revoff%} '
-
-
-  # output
-  #printf "%s%s\n" $lpad $mach
-  #printf "%s%s.%s\n" $lpad $dir $vcs
-  #printf "%s%s" $lpad $p
-  printf "%s%s" $lpad $p
+machrc_left_prompt() {
+  printf "$LEFT_PADDING_STRING$PROMPT_STRING "
 }
 
-r_prompt() {
+machrc_right_prompt() {
+  printf "$RPROMPT_STRING"
+}
+
+machrc_before_prompt() {
   vcs_info
-  local now=$(date +"%H:%M:%S%z")
-  local styled_date="%{$ITALON%}${now}%{$ITALOFF%}"
-  local p="%{$boldon%}<<%{$boldoff%}"
-  local vcs_msg=$(echo -ne $vcs_info_msg_0_)
-  local git_status="$(parse_git_status)"
-  #printf "%s%s%s" $styled_date $p $rpad
-  #printf "%s%s%s" $vcs $p $rpad
-  #printf "%s%s%s" $vcs_msg $p $rpad
-  #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
-  #printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
-  # LAST GOOD ONE BELOW
-  #printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" " $git_status" $p $rpad
-  printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" " " $p $rpad
+  local vcs=$(echo -ne ${vcs_info_msg_0_})
+  #local vcs=$(echo "$vcs_info_msg_0_" | sed 's/[[:space:]]*$//')
+  #local vcs=$($vcs_info_msg_0_)
+  local cols=$(tput cols)
+  #local text="$(basename "`pwd`") $RPROMPT_STRING "
+  local text="$vcs $RPROMPT_STRING "
+  #local text="$(echo "$vcs") $UNI_LAMBDA $(basename "`pwd`") $RPROMPT_STRING "
+  #local text="$vcs"
+  #local text=$(printf "%s%s%s" "$vcs " "$UNI_LAMBDA " "$(basename "`pwd`") $RPROMPT_STRING ")
+  local text_length=${#text}
+  local offset=$((cols - text_length))
+
+  if ((offset < 0)); then
+    offset=0
+  fi
+
+  #printf "\n%${offset}s%s%s%s\n" "" "_ $vcs " "$UNI_LAMBDA " "$text"
+  #printf "\n%${offset}s%s\n" "" "$text"
+  print -n "\e[${offset}G$text"
+
+  #echo " ... vcs_branch and pwd < "
+
+#   local cols=$(tput cols)                # Get terminal width
+#   local git_status=$(parse_git_status)  # Get git status
+#   local preprompt="$git_status $boldon<<$boldoff"
+#   local status_length=${#preprompt}    # Calculate length of status text
+#   local padding=$((cols - status_length)) # Calculate padding for alignment
+# 
+#   # Print the git status right-aligned
+#   printf "%${padding}s%s\n" "" "$preprompt"
 }
 
-__get_cwd() {
-  echo -n "${PWD##*/}"
-}
-
-update_rprompt() {
-  GIT_STATUS="$(prompt.git_count_changes)"
-  vcs_info
-  #RPROMPT="$(r_prompt) $(parse_git_status)"
-  RPROMPT="$(r_prompt)"
-
-  #RPROMPT="something$(prompt.git_count_changes)"
-}
-add-zsh-hook precmd update_rprompt
-
-precmd() {
-  #GIT_STATUS="$(prompt.git_count_changes)"
-  #vcs_info
-  #RPROMPT=$(r_prompt)
-  print "\n"
-
-  local cols=$(tput cols)                # Get terminal width
-  local git_status=$(parse_git_status)  # Get git status
-  local preprompt="$git_status $boldon<<$boldoff"
-  local status_length=${#preprompt}    # Calculate length of status text
-  local padding=$((cols - status_length)) # Calculate padding for alignment
-
-  # Print the git status right-aligned
-  printf "%${padding}s%s\n" "" "$preprompt"
-}
-
-PROMPT=$(l_prompt)
-#RPROMPT="$(r_prompt)"
-#RPROMPT=$(r_prompt)
-
-preexec() {
-  local now=$(date +"%H:%M:%S%z")
-
-  #local suf=$' %{$boldon%}<<%{$boldoff%}'
-  #local suf=$' %${boldon%}<<%${boldoff%}'
-  local suf=" <<"
-  local styled_suf=$(printf "%s%s%s" $boldon $suf $boldoff)
-  #local suf_width=$(echo -n $suf | wc -m)
-  local suf_width=${#suf}
-  local rpad_width=$(echo -n $rpad | wc -m)
-
-  local pad_width
-  (( pad_width = ${term_width} - ${suf_width} - ${rpad_width} ))
-
-  # output
-  #printf "%s%${pad_width}s%s%s%s\n" $ITALON $now $ITALOFF $suf $rpad
-  local post_prompt=$(printf "%s%${pad_width}s%s%s%s\n" $ITALON $now $ITALOFF $styled_suf $rpad)
-
-  #echo "[DEBUG] term: ${term_width} suf: ${suf_width} rpad: ${rpad_width} pad: ${pad_width} now: ${#now}"
-
-  local bold_on="\033[1m"
-  local bold_off="\033[0m"
-  
-  # Print bold text before executing each command
-  #echo -e "${bold_on}<<${bold_off}"
-  #echo -e "$post_prompt"
+machrc_after_prompt() {
+  #printf "preexec\n"
   echo ""
 }
+
+
+
+# HOOKS AND EXPORTS
+# =================
+
+machrc_precmd() {
+  machrc_before_prompt
+}
+
+machrc_preexec() {
+  machrc_after_prompt
+}
+
+machrc_update_prompt() {
+  export PROMPT=$(machrc_left_prompt)
+}
+
+machrc_update_rprompt() {
+  export RPROMPT=$(machrc_right_prompt)
+}
+
+
+
+# RUN
+# ===
+
+precmd() {
+  machrc_precmd
+}
+
+preexec() {
+  machrc_preexec
+}
+
+machrc_update_prompt
+machrc_update_rprompt
+
+
+
+# =============================================================================
+
+
+
+# 
+# 
+# 
+# UNI_LAMBDA="λ"
+# 
+# # TODO: probably refactor this to ... maybe `git.sh`? ...
+# #   or maybe I make a separate `vcs.sh` that this would better fit
+# prompt.git_count_changes() {
+#   # Get the git status output in porcelain format
+#   local git_status=$(git status --porcelain)
+# 
+#   local output_message=""
+# 
+#   # Initialize counters
+#   staged=0
+#   unstaged=0
+#   untracked=0
+#   ignored=0
+# 
+#   # Parse each line of the git status output
+#   while IFS= read -r line; do
+#       # Extract the staged and unstaged status (first and second columns)
+#       staged_status="${line:0:1}"
+#       unstaged_status="${line:1:1}"
+# 
+#       # Count staged changes (any non-space character in the first column except '?' or '!')
+#       if [[ "$staged_status" != " " && "$staged_status" != "?" && "$staged_status" != "!" ]]; then
+#           ((staged++))
+#       fi
+# 
+#       # Count unstaged changes (any non-space character in the second column except '?' or '!')
+#       if [[ "$unstaged_status" != " " && "$unstaged_status" != "?" && "$unstaged_status" != "!" ]]; then
+#           ((unstaged++))
+#       fi
+# 
+#       # Count untracked files (lines starting with '??')
+#       if [[ "$line" == "?? "* ]]; then
+#           ((untracked++))
+#       fi
+# 
+#       # Count ignored files (lines starting with '!!')
+#       if [[ "$line" == "!! "* ]]; then
+#           ((ignored++))
+#       fi
+#   done <<< "$git_status"
+# 
+#   # TODO: some logic based on each count to create an output string
+# #
+# #  if [[ $untracked -ne 0 ]]; then
+# #    echo "? $untracked"
+# #  fi
+# #
+# #  if [[ $ignored -ne 0 ]]; then
+# #    echo "! $ignored"
+# #  fi
+# 
+#   # Print the counts
+#   #echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
+#   #output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored%{$resetall%}"
+#   output_message="$fggreen+$staged $fgred-$unstaged $fgmagenta?$untracked $fgpurple!$ignored$resetall"
+# 
+#   echo "$output_message"
+# }
+# alias parse_git_status="prompt.git_count_changes"
+# 
+# vcs.git_status_hook() {
+#   local git_status_info
+#   git_status_info=$(parse_git_status)
+#   hook_com[gitstatus]="$output_message"
+# }
+# 
+# # IMPORTANT!
+# setopt promptsubst
+# 
+# autoload -Uz compinit && compinit
+# 
+# # Version control
+# autoload -Uz vcs_info
+# 
+# # Hooks
+# zstyle ':vcs_info:git:*' hooks vcs.git_status_hook
+# 
+# zstyle ':vcs_info:*' check-for-changes true
+# zstyle ':vcs_info:*' get-revision true
+# 
+# # TODO: display number of added, modified, unadded, removed files
+# #   oh-my-zsh parses `git status --porcelain` to display file info
+# #   - https://stackoverflow.com/questions/9915543/git-list-of-new-modified-deleted-files
+# #   - https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
+# 
+# # enabled systems
+# zstyle ':vcs_info:*' enable git cvs svn hg fossil
+# 
+# vcs_info_wrapper() {
+#   vcs_info
+#   if [ -n "$vcs_info_msg_0_" ]; then
+#     echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
+#   fi
+# }
+# 
+# GIT_STATUS="$(prompt.git_count_changes)"
+# #vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
+# #vcs_format="$UNI_LAMBDA %b %{$fgyellow%}(%s)%{$resetall%}"
+# vcs_format="$UNI_LAMBDA %{$fgyellow%}(%s)%{$fgcyan%}%b%{$resetall%}"
+# #vcs_format="$UNI_LAMBDA %b : $(prompt.git_count_changes) %{$fgyellow%}(%s)%{$resetall%}"
+# #vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
+# #vcs_format=" %b%{$(tput setab 5)%}(%s) "
+# #nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
+# nvcs_format=""
+# action_format=$vcs_format' '$ITALON'time for some action'$ITALOFF
+# #zstyle ':vcs_info:*' actionformats '...|%F{1}%a%F{5}]%f '
+# 
+# zstyle ':vcs_info:*' actionsformats $action_format
+# zstyle ':vcs_info:*' formats $vcs_format
+# zstyle ':vcs_info:*' nvcsformats $nvcs_format
+# 
+# 
+# 
+# local term_width
+# # zsh has 1 column of padding on the right
+# (( term_width = $COLUMNS - 1 ))
+# 
+# lpad="        "
+# #rpad=" "
+# rpad=""
+# 
+# lpad_width=$(echo -n $lpad | wc -m)
+# rpad_width=$(echo -n $rpad | wc -m)
+# 
+# l_prompt() {
+#   local mach='$(echo -ne "$ITALON$USER@$(hostname -s)$ITALOFF")'
+#   local dir='$(echo -ne "$ITALON${PWD/\/Users\/$USER/~}$ITALOFF")'
+#   local vcs='$(echo -ne ${vcs_info_msg_0_})'
+#   # for some reason, this places extra spacing after the right prompt unless
+#   #   the escapes are wrapped in `%{ %}`... not sure
+#   #   I think it's a prompt-only thing:
+#   #   - https://stackoverflow.com/questions/28799198/zsh-inserts-extra-spaces-when-performing-searches-and-completion
+#   #   - https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
+#   #local p=$'%{$boldon%}>_ %{$boldoff%}'
+#   local p=$'%{$boldon%}>_ %{$resetall%}'
+#   #local p=$'>_ %{$revoff%} '
+# 
+# 
+#   # output
+#   #printf "%s%s\n" $lpad $mach
+#   #printf "%s%s.%s\n" $lpad $dir $vcs
+#   #printf "%s%s" $lpad $p
+#   printf "%s%s" $lpad $p
+# }
+# 
+# r_prompt() {
+#   vcs_info
+#   local now=$(date +"%H:%M:%S%z")
+#   local styled_date="%{$ITALON%}${now}%{$ITALOFF%}"
+#   local p="%{$boldon%}<<%{$boldoff%}"
+#   local vcs_msg=$(echo -ne $vcs_info_msg_0_)
+#   local git_status="$(parse_git_status)"
+#   #printf "%s%s%s" $styled_date $p $rpad
+#   #printf "%s%s%s" $vcs $p $rpad
+#   #printf "%s%s%s" $vcs_msg $p $rpad
+#   #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
+#   #printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
+#   # LAST GOOD ONE BELOW
+#   #printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" " $git_status" $p $rpad
+#   printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" " " $p $rpad
+# }
+# 
+# __get_cwd() {
+#   echo -n "${PWD##*/}"
+# }
+# 
+# update_rprompt() {
+#   GIT_STATUS="$(prompt.git_count_changes)"
+#   vcs_info
+#   #RPROMPT="$(r_prompt) $(parse_git_status)"
+#   RPROMPT="$(r_prompt)"
+# 
+#   #RPROMPT="something$(prompt.git_count_changes)"
+# }
+# add-zsh-hook precmd update_rprompt
+# 
+# precmd() {
+#   #GIT_STATUS="$(prompt.git_count_changes)"
+#   #vcs_info
+#   #RPROMPT=$(r_prompt)
+#   print "\n"
+# 
+#   local cols=$(tput cols)                # Get terminal width
+#   local git_status=$(parse_git_status)  # Get git status
+#   local preprompt="$git_status $boldon<<$boldoff"
+#   local status_length=${#preprompt}    # Calculate length of status text
+#   local padding=$((cols - status_length)) # Calculate padding for alignment
+# 
+#   # Print the git status right-aligned
+#   printf "%${padding}s%s\n" "" "$preprompt"
+# }
+# 
+# PROMPT=$(l_prompt)
+# #RPROMPT="$(r_prompt)"
+# #RPROMPT=$(r_prompt)
+# 
+# preexec() {
+#   local now=$(date +"%H:%M:%S%z")
+# 
+#   #local suf=$' %{$boldon%}<<%{$boldoff%}'
+#   #local suf=$' %${boldon%}<<%${boldoff%}'
+#   local suf=" <<"
+#   local styled_suf=$(printf "%s%s%s" $boldon $suf $boldoff)
+#   #local suf_width=$(echo -n $suf | wc -m)
+#   local suf_width=${#suf}
+#   local rpad_width=$(echo -n $rpad | wc -m)
+# 
+#   local pad_width
+#   (( pad_width = ${term_width} - ${suf_width} - ${rpad_width} ))
+# 
+#   # output
+#   #printf "%s%${pad_width}s%s%s%s\n" $ITALON $now $ITALOFF $suf $rpad
+#   local post_prompt=$(printf "%s%${pad_width}s%s%s%s\n" $ITALON $now $ITALOFF $styled_suf $rpad)
+# 
+#   #echo "[DEBUG] term: ${term_width} suf: ${suf_width} rpad: ${rpad_width} pad: ${pad_width} now: ${#now}"
+# 
+#   local bold_on="\033[1m"
+#   local bold_off="\033[0m"
+#   
+#   # Print bold text before executing each command
+#   #echo -e "${bold_on}<<${bold_off}"
+#   #echo -e "$post_prompt"
+#   echo ""
+# }
+# 
+# 
+# 
+
 
