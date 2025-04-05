@@ -1,0 +1,15 @@
+
+/* click-to-drag on full border, but not the content */
+#main-window {
+  -moz-window-dragging: drag;
+  cursor: grab;
+}
+#main-window:active {
+  cursor: grabbing;
+}
+#navigator-toolbox,
+#browser {
+  -moz-window-dragging: no-drag;
+  cursor: auto;
+}
+

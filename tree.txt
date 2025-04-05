@@ -1,0 +1,80 @@
+.
+├── LICENSE
+├── README.md
+├── asdf
+│   ├── tool-versions
+│   └── tool-versions-local
+├── bash
+│   └── prompt.bash
+├── docs
+│   └── references.md
+├── extras
+│   └── bell.sh
+├── firefox
+│   ├── NOTES.md
+│   ├── chrome
+│   │   ├── frame
+│   │   │   └── window.css
+│   │   ├── local.css
+│   │   ├── theme
+│   │   │   └── theme.css
+│   │   ├── userChrome.css
+│   │   └── userChrome.void.css
+│   ├── config-firefox.sh
+│   └── extensions
+├── install.sh
+├── linux
+├── local
+│   ├── firefox.sh
+│   └── servers.sh
+├── macos
+│   ├── darwin.sh
+│   ├── silicon.sh
+│   ├── terminal.app
+│   └── touchbar.sh
+├── nvim
+│   ├── init.lua
+│   └── nvim-notes.md
+├── sh
+│   ├── aliases.sh
+│   ├── env.sh
+│   ├── motd.sh
+│   ├── prompt.sh
+│   └── utils.sh
+├── shell
+├── terminal
+│   ├── italicinfo.terminfo
+│   ├── tmux-256color.terminfo
+│   └── xterm-256color.terminfo
+├── tmux
+│   ├── tmux-256color
+│   └── tmux.conf
+├── tree.txt
+├── vim
+│   ├── NOTES.md
+│   ├── opts.vim
+│   ├── remaps.vim
+│   └── vimrc
+├── windows
+└── zsh
+    ├── aliases.zsh
+    ├── ansi.zsh
+    ├── apparatus.zsh
+    ├── git.zsh
+    ├── local.zsh
+    ├── macbookair10,1.zsh
+    ├── old_prompt.zsh
+    ├── options.zsh
+    ├── prompt.zsh
+    ├── test.zsh
+    ├── tty.zsh
+    ├── utils.zsh
+    ├── web.zsh
+    ├── xcode.zsh
+    ├── zlogin
+    ├── zlogout
+    ├── zprofile
+    ├── zshenv
+    └── zshrc
+
+23 directories, 55 files

@@ -1,0 +1,11 @@
+Plugins
+- Netrw, built-in file explorer
+- Plenary, asynchronous support
+- Telescope, file picker and modal skeleton
+- Treesitter, syntax highlighting
+- LSP?, because who memorizes languages these days
+- Xcodebuild, for making Xcode projects in Neovim
+    - https://github.com/wojciech-kulik/xcodebuild.nvim
+    - I like the idea of doing shorcuts with `<Leader>x`
+- WhichKey, for figuring out what does what
+    - https://github.com/folke/which-key.nvim

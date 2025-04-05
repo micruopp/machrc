@@ -1,0 +1,176 @@
+printnev
+printenv
+cd $MACHRC_DIR/zsh
+ls
+ls -la
+ln -s zshrc .zshrc
+ls -la
+cat ,zshrc
+cat .zshrc
+clear
+ls
+ls -la
+exec zsh
+vim zshrc
+clear
+c $MACHRC_DIR
+l
+vim .
+clear
+exec zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+gitst
+git add zsh/prompt.zsh
+vim zsh/prompt.zsh
+exec zsh
+clear
+l macos
+vim macos/apple_arm.sh
+vim macos/apple_x86.sh
+cat macos/silicon.sh
+l macos/silicon.sh
+cat macos/darwin.sh
+vim zsh/zshrc
+clear
+exec zsh
+vim zsh/zshrc
+exec zsh
+vim zsh/zshrc
+exec zsh
+clear
+vim zsh/zshrc
+exec zsh
+clear
+asdf
+clear
+gitst
+git add zsh/zshrc
+git add macos/apple_arm.sh
+git add macos/apple_x86.sh
+clear
+gitcm "separated silicon and intel scripts"
+vim zsh/prompt.zsh
+vim zsh/prompt.zsh
+exec zsh
+clear
+gitst
+git add zsh/prompt.zsh
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+\
+rows
+$(tput rows)
+echo $(tput cols)
+echo $(tput rows)
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+gitst
+git add zsh/prompt.zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+vim zsh/prompt.zsh
+exec zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+clear
+vim zsh/prompt.zsh
+clear
+gitst
+git log --oneline
+clear
+gitst
+git add zsh/prompt.zsh
+gitcm "sorta working..."
+git checkout main
+gitlo
+gitst
+clear
+cat zsh/zshrc
+git checkout siliconxarm 
+clear
+cat zsh/zshrc
+git log --oneline
+git checkout -b feat/git-status-prompt
+clear
+gitlo
+git checkout siliconxarm 
+clear
+gitlo
+git reset --hard HEAD~1
+clear
+gitlo
+cat zsh/zshrc
+ls
+c $MACHRC_DIR
+git status
+l
+ls
+vim zsh/zshrc
+printenv
+brew
+c /opt/homebrew/bin
+l
+ls
+clear
+brew
+export PATH=$PATH:/opt/homebrew/bin
+brew
+brew doctor
+c $MACHRC_Dir
+c $MACHRC_DIR
+vim zsh/zshenv
+exec zsh
+clear
+brew
+c $MACHRC_DIR
+clear
+gitlo
+exec zsh
+clear
+vim zsh/prompt.zsh
+exec zsh
+clear
+git checkout
+git add zsh/prompt
+git add zsh/prompt.zsh 
+gitcm "fix prompt coloring"
+git push
+gitlo
+git checkout main
+gitlo
+git merge siliconxarm
+clear
+git push
+clear
+ssh public-dashboard
+clear
+ssh public-dashboard
