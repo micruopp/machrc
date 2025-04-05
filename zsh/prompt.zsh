@@ -17,7 +17,10 @@ UNI_LAMBDA="λ"
 #   or maybe I make a separate `vcs.sh` that this would better fit
 prompt.git_count_changes() {
   # Get the git status output in porcelain format
-  local git_status=$(git status --porcelain)
+  # XXX: pretty sure `porcelain` flag shouldn't be used in script -- it's fragile
+  #echo "before git status --porcelain"
+  local git_status=$(git status -z --porcelain)
+  #echo "after git status --porcelain"
 
   local output_message=""
 
@@ -32,6 +35,8 @@ prompt.git_count_changes() {
       # Extract the staged and unstaged status (first and second columns)
       staged_status="${line:0:1}"
       unstaged_status="${line:1:1}"
+      #echo "staged_status   $staged_status"
+      #echo "unstaged_status $unstaged_status"
 
       # Count staged changes (any non-space character in the first column except '?' or '!')
       if [[ "$staged_status" != " " && "$staged_status" != "?" && "$staged_status" != "!" ]]; then
@@ -54,19 +59,29 @@ prompt.git_count_changes() {
       fi
   done <<< "$git_status"
 
-  # TODO: some logic based on each count to create an output string
-#
-#  if [[ $untracked -ne 0 ]]; then
-#    echo "? $untracked"
-#  fi
-#
-#  if [[ $ignored -ne 0 ]]; then
-#    echo "! $ignored"
-#  fi
+  local staged_string=""
+  if [[ $staged -ne 0 ]]; then
+    staged_string="+$staged"
+  fi
+
+  local unstaged_string=""
+  if [[ $unstaged -ne 0 ]]; then
+    unstaged_string="-$unstaged"
+  fi
+
+  local untracked_string=""
+  if [[ $untracked -ne 0 ]]; then
+    untracked_string="?$untracked"
+  fi
+
+  local ignored_string=""
+  if [[ $ignored -ne 0 ]]; then
+    ignored_string="! $ignored"
+  fi
 
   # Print the counts
   #echo "S:$staged U:$unstaged ?:$untracked !:$ignored"
-  output_message="%{$fggreen%}+$staged %{$fgred%}-$unstaged %{$fgmagenta%}?$untracked %{$fgpurple%}!$ignored"
+  output_message="%{$fggreen%}$staged_string %{$fgred%}$unstaged_string %{$fgmagenta%}$untracked_string %{$fgpurple%}!$ignored_string%{$resetall%}"
 
   echo "$output_message"
 }
@@ -75,7 +90,8 @@ alias parse_git_status="prompt.git_count_changes"
 vcs.git_status_hook() {
   local git_status_info
   git_status_info=$(parse_git_status)
-  hook_com[gitstatus]="$output_message"
+  #hook_com[gitstatus]="$output_message"
+  hook_com[gitstatus]="$git_status_info"
 }
 
 # IMPORTANT!
@@ -110,7 +126,8 @@ vcs_info_wrapper() {
 GIT_STATUS="$(prompt.git_count_changes)"
 #vcs_format=" $UNI_LAMBDA %b%{$(tput setab 5)%}(%s) "
 #vcs_format="$UNI_LAMBDA %b : $(prompt.git_count_changes) %{$fgyellow%}(%s)%{$resetall%}"
-vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
+#vcs_format="$UNI_LAMBDA %b : ${hook_com[gitstatus]} %{$fgyellow%}(%s)%{$resetall%}"
+vcs_format=" %b ${hook_com[gitstatus]}%{$fgyellow%}(%s)%{$resetall%} $UNI_LAMBDA"
 #vcs_format=" %b%{$(tput setab 5)%}(%s) "
 #nvcs_format="%{$ITALON%}nvcs%{$ITALOFF%}"
 nvcs_format=""
@@ -166,7 +183,8 @@ r_prompt() {
   #printf "%s%s%s" $vcs_msg $p $rpad
   #printf "%s%s%s%s%s%s" '$(__get_cwd) ' "%{$(tput rev)%}" "$vcs_msg" "%{$(tput sgr0)%}" $p $rpad
   #printf "%s%s%s%s%s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '$(prompt.git_count_changes)' $p $rpad
-  printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '' $p $rpad
+  #printf "%s%s %s%s %s%s" "%{$fgblue%}$(__get_cwd)%{$resetall%}" "" "$vcs_msg" '' $p $rpad
+  printf "%s%s%s%s%s%s" "$GIT_STATUS$vcs_msg " "" "%{$fgblue%}$(__get_cwd)%{$resetall%} " '' $p $rpad
 }
 
 __get_cwd() {
@@ -184,7 +202,7 @@ add-zsh-hook precmd update_rprompt
 
 precmd() {
   GIT_STATUS="$(prompt.git_count_changes)"
-  vcs_info
+  #vcs_info
   #RPROMPT=$(r_prompt)
   #print "\n"
   print ""
