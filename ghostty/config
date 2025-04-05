@@ -1,0 +1,29 @@
+background = #0A102C
+background-opacity = 0.8
+background-blur = 16
+
+foreground = #AFFFFF
+
+bold-is-bright = true
+
+cursor-color = #9990FF
+cursor-style = block
+cursor-style-blink = true
+
+selection-foreground = #8972F3
+selection-background = #4700F3
+
+font-family = "SF Mono"
+font-size = 14
+
+adjust-cell-height = 6
+adjust-cell-width = 1
+
+palette = 4=#4284FF
+palette = 5=#B200B2
+palette = 12=#0096FF
+palette = 13=#E500E5
+
+#window-decoration = none
+window-height = 32
+window-width = 128
