@@ -20,6 +20,7 @@ set relativenumber
 set ruler
 
 " Change colorscheme
+" colorscheme default
 colorscheme peachpuff
 " xterm-256-color-chart: https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
 hi Normal ctermbg=NONE ctermfg=15
