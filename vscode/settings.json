@@ -1,0 +1,17 @@
+{
+  "workbench.colorTheme": "Default High Contrast",
+  "workbench.preferredDarkColorTheme": "Default High Contrast",
+  "workbench.preferredLightColorTheme": "Default High Contrast Light",
+  "window.autoDetectColorScheme": true,
+  "editor.fontFamily": "Monaco, 'Courier New', monospace",
+  "editor.fontSize": 14,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true,
+  "editor.renderWhitespace": "boundary",
+  "editor.rulers": [80, 120],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "github.copilot.chat.model": "claude-3.5-sonnet"
+}
