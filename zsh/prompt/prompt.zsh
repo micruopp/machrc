@@ -4,9 +4,12 @@
 # @desc Root prompt file
 
 # IMPORTANT!
-setopt promptsubst
+# For dynamic prompt evaluation
+setopt PROMPT_SUBST
+
 # Probably make a `conf_prompt.zsh` file if I get a lot more of the above
 
+. "$MACHRC_DIR/zsh/prompt/prompt_vcs_info.zsh"
 . "$MACHRC_DIR/zsh/prompt/after_prompt.zsh"
 . "$MACHRC_DIR/zsh/prompt/before_prompt.zsh"
 . "$MACHRC_DIR/zsh/prompt/left_prompt.zsh"

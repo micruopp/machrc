@@ -13,5 +13,6 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
-  "github.copilot.chat.model": "claude-3.5-sonnet"
+  "github.copilot.chat.model": "claude-3.5-sonnet",
+  "terminal.integrated.showExitAlert": false
 }
