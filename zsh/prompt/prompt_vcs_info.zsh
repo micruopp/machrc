@@ -30,16 +30,27 @@ zstyle ':vcs_info:git:*' check-for-staged-changes true
 # Custom markers
 zstyle ':vcs_info:git:*' stagedstr '+'
 zstyle ':vcs_info:git:*' unstagedstr '*'
-zstyle ':vcs_info:git:*' untrackedstr '?'
+# Note: untrackedstr requires a custom hook (see below)
 
 # Branch formats
-zstyle ':vcs_info:git:*' formats '%b %c%u%m'
-zstyle ':vcs_info:git:*' actionformats '%b|%a %c%u%m'
+# %b = branch name
+# %c = staged changes indicator (uses stagedstr)
+# %u = unstaged changes indicator (uses unstagedstr)
+zstyle ':vcs_info:git:*' formats '%b %c%u'
+zstyle ':vcs_info:git:*' actionformats '%b|%a %c%u'
 
 # Upstream tracking
 zstyle ':vcs_info:git:*' get-revision true
-zstyle ':vcs_info:git:*' use-simple true
-# zstyle ':vcs_info:git:*' get-dirty true # Is this a real thing?
+zstyle ':vcs_info:git:*' use-simple false
+
+# Hook to detect untracked files
++vi-git-untracked() {
+  if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+     git status --porcelain 2> /dev/null | grep -q '^??'; then
+    hook_com[unstaged]+='?'
+  fi
+}
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 
 
 # Configure vcs_info to show git branch and status
