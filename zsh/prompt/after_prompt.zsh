@@ -5,7 +5,7 @@
 
 preexec() {
   # Render anything to show after the prompt
-  echo ""
-  echo "THIS IS THE AFTER PROMPT HOOK"
+  # echo ""
+  # echo "THIS IS THE AFTER PROMPT HOOK"
   echo ""
 }

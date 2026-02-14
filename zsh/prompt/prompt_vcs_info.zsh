@@ -2,23 +2,27 @@
 
 # prompt_vcs_info.zsh
 # @desc Configure Z-shell's built-in version control system info for the prompt
-
+#
+# Git / VCS Status Symbols:
+#   ✚  (U+271A) added files
+#   ●  (U+25CF) modified files
+#   ✖  (U+2716) deleted files
+#   ✔  (U+2714) clean working tree -- TODO: Clean should be lack of an indicator
+#   …  (U+2026) untracked files
+#   ⎇  (U+2387) branch indicator
+#   @  (U+0040) detached HEAD -- is this really the unicode for "@"?
+#   ⇡  (U+21E1) ahead of upstream
+#   ⇣  (U+21E3) behind upstream
+#   ⇕  (U+21D5) diverged from upstream
+#
+# Example output: ⎇ main ● ⇡2/⇣1
+#
 # TODO: Possible enhancements:
-# - Add upstream arrows (↑ ↓ ↕) via %p
 # - Add stash count (git stash list | wc -l)
 # - Make this async for large repos
-# - Move this into a prompt_git.zsh module
-
-
-# For dynamic prompt evaluation
-# setopt PROMPT_SUBST
 
 autoload -Uz vcs_info
 autoload -Uz add-zsh-hook
-
-# Enable vcs_info for git status
-# precmd_vcs_info() { vcs_info }
-# precmd_functions+=( precmd_vcs_info )
 
 # Enable git backend
 zstyle ':vcs_info:*' enable git
@@ -27,89 +31,55 @@ zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' check-for-changes true
 zstyle ':vcs_info:git:*' check-for-staged-changes true
 
-# Custom markers
+# Custom markers (used by the hook below)
 zstyle ':vcs_info:git:*' stagedstr '+'
 zstyle ':vcs_info:git:*' unstagedstr '*'
-# Note: untrackedstr requires a custom hook (see below)
 
 # Branch formats
 # %b = branch name
-# %c = staged changes indicator (uses stagedstr)
-# %u = unstaged changes indicator (uses unstagedstr)
-zstyle ':vcs_info:git:*' formats '%b %c%u'
-zstyle ':vcs_info:git:*' actionformats '%b|%a %c%u'
+# %m = misc (our custom detailed status from hook)
+zstyle ':vcs_info:git:*' formats '%b %m'
+zstyle ':vcs_info:git:*' actionformats '%b|%a %m'
 
 # Upstream tracking
 zstyle ':vcs_info:git:*' get-revision true
 zstyle ':vcs_info:git:*' use-simple false
 
-# Hook to detect untracked files
-+vi-git-untracked() {
-  if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
-     git status --porcelain 2> /dev/null | grep -q '^??'; then
-    hook_com[unstaged]+='?'
+# Hook to detect detailed git status
++vi-git-status() {
+  if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) != 'true' ]]; then
+    return
   fi
-}
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
 
+  # Store detailed status in user_data for later retrieval
+  local -a status_lines
+  status_lines=(${(f)"$(git status --porcelain 2>/dev/null)"})
 
-# Configure vcs_info to show git branch and status
-# zstyle ':vcs_info:git:*' formats '%b%u%c'
-# zstyle ':vcs_info:git:*' actionformats '%b|%a%u%c'
-# zstyle ':vcs_info:*' check-for-changes true
-# zstyle ':vcs_info:git:*' unstagedstr '*'
-# zstyle ':vcs_info:git:*' stagedstr '+'
-# zstyle ':vcs_info:git:*' stagedstr '●'
+  local added=0 modified=0 deleted=0 untracked=0
 
-# ------------------------------------------------------------
-# Helper: build git state indicators
-# ------------------------------------------------------------
+  for line in $status_lines; do
+    case "${line:0:2}" in
+      '??') ((untracked++)) ;;
+      'A '|'AM') ((added++)) ;;
+      ' M'|'MM'|'M ') ((modified++)) ;;
+      ' D'|'D '|'DM') ((deleted++)) ;;
+      *) ;;
+    esac
+  done
 
-__machrc_build_git_state() {
-  local state=""
+  # Build status string
+  local git_status=''
+  (( added > 0 )) && git_status+='+'
+  (( modified > 0 )) && git_status+='*'
+  (( deleted > 0 )) && git_status+='x'
+  (( untracked > 0 )) && git_status+='?'
 
-  # Staged changes
-  [[ -n ${vcs_info_msg_1_} ]] && state+="+"
+  # Wrap in bold if not empty
+  [[ -n "$git_status" ]] && git_status="%B${git_status}%b"
 
-  # Unstaged changes
-  [[ -n ${vcs_info_msg_2_} ]] && state+="*"
-
-  # Untracked files
-  [[ -n ${vcs_info_msg_3_} ]] && state+="?"
-
-  [[ -n $state ]] && echo " $state"
-}
-
-# ------------------------------------------------------------
-# Helper: upstream indicators
-# ------------------------------------------------------------
-
-__machrc_build_git_upstream() {
-  local ahead behind
-
-  ahead=${vcs_info_msg_4_%% *}
-  behind=${vcs_info_msg_4_#* }
-
-  if [[ $ahead -gt 0 && $behind -gt 0 ]]; then
-    echo " ↕${ahead}/${behind}"
-  elif [[ $ahead -gt 0 ]]; then
-    echo " ↑${ahead}"
-  elif [[ $behind -gt 0 ]]; then
-    echo " ↓${behind}"
-  fi
+  # If nothing, leave empty
+  # Store in misc for %m expansion
+  hook_com[misc]="$git_status"
 }
 
-# ------------------------------------------------------------
-# Normalize state ordering: + * ?
-# ------------------------------------------------------------
-
-__machrc_normalize_git_state() {
-  local raw="$1"
-  local state=""
-
-  [[ $raw == *+* ]] && state+="+"
-  [[ $raw == *** ]] && state+="*"
-  [[ $raw == *\?* ]] && state+="?"
-
-  [[ -n $state ]] && echo " $state"
-}
+zstyle ':vcs_info:git*+set-message:*' hooks git-status
