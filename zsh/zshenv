@@ -7,7 +7,7 @@
 
 # default text editor
 #   _maybe this section will be expanded to other types of editors and tools, depending on how my workflows evolve._
-export EDITOR=nvim
+#export EDITOR=nvim
 
 # iCloud
 export ICLOUD_DIR="/Users/$USER/Library/Mobile\ Documents/com\~apple\~CloudDocs"
