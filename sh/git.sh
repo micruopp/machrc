@@ -21,3 +21,10 @@ gitst() {
   git status
 }
 
+ggraph() {
+  git log --all --decorate --oneline --graph
+}
+
+gbranch() {
+  git -c color.branch=always branch -a | grep -v "remote"
+}

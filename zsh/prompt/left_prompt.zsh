@@ -1,23 +1,44 @@
 #!/bin/zsh
 
 # left_prompt.zsh
-# @desc Left side of the zsh prompt
+# @desc Left side of the prompt
 
 #   TODO: Refactor to a "resources" file
 #   - https://stackoverflow.com/questions/28799198/zsh-inserts-extra-spaces-when-performing-searches-and-completion
 #   - https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
 
 
-l_prompt() {
-  # 8 spaces  (or 2 tabs)
-  #local lpad="        "
-  # 4 spaces  (or 1 tabs)
-  local lpad="    "
-  local p=$'%{$boldon%}>_  %{$resetall%}'
+__machrc_left_prompt() {
+  # 8 spaces padding
+  local left_padding="        "
 
-  local left_prompt="$lpad$p"
+  # Get current directory relative to home
+  local relative_location='%~'
 
-  print "$left_prompt"
+  local the_prompt=">_"
+
+  # Get git status using vcs_info
+  # local git_status=''
+  # if [[ -n $vcs_info_msg_0_ ]]; then
+  #   gitstatus=" $vcs_info_msg_0_"
+  # fi
+
+  # Prompt line with directory and git status
+  # local info_line="${left_padding}%F{blue}${relative_location}%f (${vcs_info_msg_0_})"
+  local info_line="${left_padding}%F{blue}${relative_location}%f ${GIT_PROMPT_INFO}"
+
+  # Input prompt (on the next line)
+  local input_prompt="${left_padding}"$'%{$boldon%}%{$the_prompt%}%{$resetall%} '
+
+  # Combine with newline between them
+  local left_prompt="${info_line}"$'\n'"${input_prompt}"
+
+  print -P "$left_prompt"
 }
 
-PROMPT="$(l_prompt)"
+PROMPT='$(__machrc_left_prompt)'
+
+
+# Prompt definition
+# PROMPT='%F{blue}%~%f (${vcs_info_msg_0_})
+# %F{green}>_ %f'
