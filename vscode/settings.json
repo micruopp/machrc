@@ -14,5 +14,17 @@
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
   "github.copilot.chat.model": "claude-3.5-sonnet",
-  "terminal.integrated.showExitAlert": false
+  "terminal.integrated.showExitAlert": false,
+  "github.copilot.chat.copilotMemory.enabled": true,
+  "github.copilot.chat.agent.autoFix": true,
+  "window.commandCenter": false,
+  "workbench.commandPalette.experimental.suggestCommands": true,
+  "chat.checkpoints.showFileChanges": true,
+  "workbench.editor.openSideBySideDirection": "down",
+  "workbench.editor.showTabs": "single",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "markdown.preview.breaks": true,
+  "telemetry.editStats.enabled": false,
+  "telemetry.feedback.enabled": false,
+  "telemetry.telemetryLevel": "off"
 }
