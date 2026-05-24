@@ -11,3 +11,6 @@ local/
 .archive
 .zsh_history
 .zsh_sessions
+
+# macOS
+.DS_Store

@@ -10,11 +10,13 @@
 #export EDITOR=nvim
 
 # iCloud
-export ICLOUD_DIR="/Users/$USER/Library/Mobile\ Documents/com\~apple\~CloudDocs"
+#export ICLOUD_DIR="/Users/$USER/Library/Mobile\ Documents/com\~apple\~CloudDocs"
+export ICLOUD="/Users/$USER/Library/Mobile Documents/com~apple~CloudDocs"
 
 # TODO: also conform to $XDG_CONFIG
-__MACHRC_DIR="/Users/$USER/Developer/machrc"
+__MACHRC_DIR="/Users/$USER/.machrc"
 export MACHRC_DIR="$__MACHRC_DIR"
+export MACHRC="$__MACHRC_DIR"
 #export ZDOTDIR="$__MACHRC_DIR/zsh"
 
 # TODO: add call to add third-party sources to PATH

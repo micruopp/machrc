@@ -17,7 +17,6 @@
   "terminal.integrated.showExitAlert": false,
   "github.copilot.chat.copilotMemory.enabled": true,
   "github.copilot.chat.agent.autoFix": true,
-  "window.commandCenter": false,
   "workbench.commandPalette.experimental.suggestCommands": true,
   "chat.checkpoints.showFileChanges": true,
   "workbench.editor.openSideBySideDirection": "down",
@@ -26,5 +25,12 @@
   "markdown.preview.breaks": true,
   "telemetry.editStats.enabled": false,
   "telemetry.feedback.enabled": false,
-  "telemetry.telemetryLevel": "off"
+  "telemetry.telemetryLevel": "off",
+  "python.analysis.typeCheckingMode": "standard",
+  "git.blame.editorDecoration.enabled": true,
+  "git.blame.ignoreWhitespace": true,
+  "workbench.navigationControl.enabled": false,
+  "chat.agentsControl.enabled": false,
+  "chat.unifiedAgentsBar.enabled": true,
+  "workbench.layoutControl.enabled": false
 }
